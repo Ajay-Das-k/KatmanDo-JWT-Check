@@ -1,6 +1,8 @@
 // server.js
+
 // Load environment variables from .env file
 require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -22,10 +24,8 @@ app.use(morgan("dev")); // Logging
 // Routes
 app.use("/api/auth", authRoutes);
 
-
-
-// Protected route that requires JWT
-router.get("/protected", auth, (req, res) => {
+// ✅ Protected route that requires JWT
+app.get("/api/protected", auth, (req, res) => {
   return res.status(200).json({
     success: true,
     message: "Hai I am tokened",
