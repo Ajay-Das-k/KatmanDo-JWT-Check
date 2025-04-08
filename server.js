@@ -7,39 +7,59 @@
 // - models/            (database models)
 // - config/            (configuration)
 // - middleware/        (custom middleware)
-// working code implimented
+// - .env               (environment variables)
+
 // server.js
+// Load environment variables from .env file
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
 const authRoutes = require("./routes/authRoutes");
 const config = require("./config/config");
 
+// Initialize express app
 const app = express();
 
-// Middleware
+// Enhanced Middleware
+app.use(helmet()); // Security headers
 app.use(cors());
 app.use(express.json());
+app.use(morgan("dev")); // Logging
 
 // Routes
 app.use("/api/auth", authRoutes);
 
-// Connect to MongoDB
+// Basic error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    error: "Server error",
+  });
+});
+
+// Connect to MongoDB with improved options
 mongoose
-  .connect(config.mongoURI)
+  .connect(config.mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+  })
   .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1); // Exit process with failure
+  });
 
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(
+    `Server running on port ${PORT} in ${
+      process.env.NODE_ENV || "development"
+    } mode`
+  );
 });
-
-// config/config.js
-module.exports = {
-  mongoURI:
-    process.env.MONGO_URI || "mongodb://localhost:27017/appscript-users",
-  jwtSecret: process.env.JWT_SECRET || "your-secret-key",
-  jwtExpiration: "24h",
-};

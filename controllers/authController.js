@@ -28,6 +28,12 @@ exports.login = async (req, res) => {
         userId,
       });
       await user.save();
+      console.log(`New user created: ${userId}`);
+    } else {
+      // Update last login time
+      user.lastLogin = Date.now();
+      await user.save();
+      console.log(`User logged in: ${userId}`);
     }
 
     // Generate JWT token
@@ -41,6 +47,11 @@ exports.login = async (req, res) => {
     return res.status(200).json({
       success: true,
       token,
+      user: {
+        email: user.email,
+        userId: user.userId,
+        createdAt: user.createdAt,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
