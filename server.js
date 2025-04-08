@@ -8,6 +8,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const authRoutes = require("./routes/authRoutes");
 const config = require("./config/config");
+const auth = require("./middleware/auth");
 
 // Initialize express app
 const app = express();
@@ -21,7 +22,7 @@ app.use(morgan("dev")); // Logging
 // Routes
 app.use("/api/auth", authRoutes);
 
-const auth = require("../middleware/auth");
+
 
 // Protected route that requires JWT
 router.get("/protected", auth, (req, res) => {
