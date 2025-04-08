@@ -21,6 +21,17 @@ app.use(morgan("dev")); // Logging
 // Routes
 app.use("/api/auth", authRoutes);
 
+const auth = require("../middleware/auth");
+
+// Protected route that requires JWT
+router.get("/protected", auth, (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Hai I am tokened",
+    user: req.user, // This contains the decoded JWT payload
+  });
+});
+
 // Basic error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
